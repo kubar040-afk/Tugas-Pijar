@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengingat Servis App</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #1a202c;
+            --text-muted: #718096;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --success: #10b981;
+            --success-bg: #ecfdf5;
+            --danger: #ef4444;
+            --danger-bg: #fef2f2;
+            --warning: #f59e0b;
+            --warning-bg: #fffbeb;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4f8 100%);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        header {
+            text-align: center;
+            padding: 3rem 1rem 1.5rem 1rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(to right, #4f46e5, #06b6d4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        header p {
+            font-size: 1.05rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 1rem 1rem 3rem 1rem;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            width: 100%;
+            max-width: 580px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .dynamic-group {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #4a5568;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            background-color: #f8fafc;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+        }
+
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.3);
+            opacity: 0.95;
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1.25rem;
+            border-radius: 14px;
+            font-weight: 600;
+            text-align: center;
+            display: none;
+            font-size: 1.05rem;
+            line-height: 1.5;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .alert-danger {
+            background-color: var(--danger-bg);
+            color: #b91c1c;
+            border: 1px solid #fee2e2;
+        }
+
+        .alert-success {
+            background-color: var(--success-bg);
+            color: #047857;
+            border: 1px solid #d1fae5;
+        }
+
+        .checklist-box {
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .checklist-box h4 {
+            color: var(--text-main);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 0.5rem;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 0.85rem;
+            font-size: 0.95rem;
+            color: #334155;
+            padding: 0.5rem 0;
+        }
+
+        .checklist-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .checklist-item .badge {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            padding: 0.25rem 0.6rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-right: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .checklist-item .badge-safe {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            color: white;
+        }
+
+        .checklist-item-text strong {
+            color: var(--text-main);
+        }
+
+        .checklist-item-text p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 0.15rem;
+        }
+
+        footer {
+            background: transparent;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 1.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Pengingat Servis</h1>
+        <p>Asisten Digital Perawatan Motor Anda</p>
+    </header>
+
+    <main>
+        <div class="container">
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label for="jenisKendaraan">Jenis Kendaraan</label>
+                    <select id="jenisKendaraan" required>
+                        <option value="" disabled selected>-- Pilih Jenis Motor --</option>
+                        <option value="matic">Motor Matic (Otomatis)</option>
+                        <option value="gigi">Motor Bebek (Manual / Gigi)</option>
+                        <option value="kopling">Motor Kopling (Sport / Manual)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="kategoriPemakaian">Kategori Pemakaian Harian</label>
+                    <select id="kategoriPemakaian" required>
+                        <option value="" disabled selected>-- Pilih Kategori Pemakaian --</option>
+                        <option value="tidak_terpakai">Tidak Terpakai (Mengendap di Garasi)</option>
+                        <option value="normal">Pemakaian Normal (Rumah-Kantor/Sekolah: ~27 KM/hari)</option>
+                        <option value="berat">Pemakaian Sering/Berat (Komuter Antar Kota: ~50 KM/hari)</option>
+                        <option value="sangat_berat">Pemakaian Sangat Berat (Ojol/Kurir: ~150 KM/hari)</option>
+                    </select>
+                </div>
+
+                <div id="grupTanggal" class="form-group dynamic-group">
+                    <label for="tanggalTerakhir">Tanggal Servis Terakhir</label>
+                    <input type="date" id="tanggalTerakhir">
+                </div>
+                
+                <div id="grupKmTerakhir" class="form-group dynamic-group">
+                    <label for="kmTerakhir">KM Servis Terakhir</label>
+                    <input type="number" id="kmTerakhir" placeholder="Contoh: 12000" min="0">
+                </div>
+
+                <div id="grupKmSekarang" class="form-group dynamic-group">
+                    <label for="kmSekarang">KM Sekarang (Kosongkan jika ingin estimasi otomatis)</label>
+                    <input type="number" id="kmSekarang" placeholder="Contoh: 14500" min="0">
+                </div>
+
+                <button type="submit">Cek Status Servis</button>
+            </form>
+
+            <div id="resultBox" class="result"></div>
+
+            <div id="checklistBox" class="checklist-box"></div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Pengingat Servis App &bull; Berkendara dengan Aman</p>
+    </footer>
+
+    <script>
+        // DATA 1: KHUSUS JIKA MOTOR "TIDAK TERPAKAI / MENGANGGUR" (BERBASIS BULAN/HARI)
+        const aturanMenganggur = {
+            umum: [
+                { nama: "Aki (Baterai)", intervalHari: 60, ket: "Aki yang didiamkan tanpa sirkulasi pengisian mudah tekor/soak." },
+                { nama: "Bensin di Dalam Tangki", intervalHari: 60, ket: "Bensin mengendap lama bisa basi dan memicu kondensasi air di tangki." },
+                { nama: "Oli Mesin", intervalHari: 90, ket: "Oli bisa mengalami oksidasi dan mengental meski motor tidak berjalan." },
+                { nama: "Busi", intervalHari: 365, ket: "Pengecekan karat atau kelembaban area ruang bakar karena motor mati lama." },
+                { nama: "Ban Motor", intervalHari: 365, ket: "Ban rentan kempes, pecah-pecah (flat spot) karena menahan beban di satu titik." },
+                { nama: "Minyak Rem", intervalHari: 730, ket: "Minyak rem dapat menyerap uap air, menurunkan kualitas pengereman." }
+            ],
+            matic: [
+                { nama: "Oli Gardan", intervalHari: 180, ket: "Cegah keausan internal gigi rasio matic dari endapan oli." },
+                { nama: "V-Belt & Roller", intervalHari: 730, ket: "Karet tali kipas bisa menjadi kaku dan pecah-pecah jika jarang berputar." }
+            ],
+            gigi: [
+                { nama: "Rantai & Gear Set", intervalHari: 180, ket: "Rantai yang menganggur lama akan mengering, berkarat, dan kaku." },
+                { nama: "Kampas Kopling", intervalHari: 365, ket: "Kampas kopling basah bisa lengket jika tidak pernah mendapat pelumasan putaran mesin." }
+            ],
+            kopling: [
+                { nama: "Sil Shockbreaker Depan", intervalHari: 365, ket: "Sil karet suspensi bisa mengeras dan pecah sehingga memicu kebocoran oli shock." },
+                { nama: "Air Radiator (Coolant)", intervalHari: 365, ket: "Cairan coolant bisa mengendap menimbulkan karat/korosi pada inner core radiator." }
+            ]
+        };
+
+        // DATA 2: UNTUK MOTOR YANG AKTIF DIKENAKAN (BERBASIS JARAK KM STANDAR PABRIKAN)
+        const aturanJalan = {
+            matic: [
+                { nama: "Oli Mesin", intervalKm: 2000, ket: "Ganti berkala untuk mencegah keausan mesin akibat macet harian." },
+                { nama: "Servis & Pembersihan CVT", intervalKm: 4000, ket: "Bersihkan debu rumah roller agar akselerasi lancar tidak bergetar." },
+                { nama: "Oli Gardan (Gear Oil)", intervalKm: 8000, ket: "Ganti oli transmisi matic biar awet." },
+                { nama: "Busi", intervalKm: 8000, ket: "Ganti busi demi menjaga sistem pengapian optimal." },
+                { nama: "Filter Udara", intervalKm: 12000, ket: "Ganti penapis udara agar konsumsi BBM tidak boros." },
+                { nama: "Ganti V-Belt & Roller Set", intervalKm: 20000, ket: "Segera ganti set komponen CVT untuk menghindari putus di jalan." }
+            ],
+            gigi: [
+                { nama: "Perawatan Rantai Roda", intervalKm: 1000, ket: "Setel kekencangan dan lumasi rantai motor bebek Anda." },
+                { nama: "Oli Mesin", intervalKm: 2000, ket: "Ganti pelumas demi kesehatan mesin dan merendam komponen kopling basah." },
+                { nama: "Penyetelan Kopling", intervalKm: 4000, ket: "Setel ulang tuas gigi agar perpindahan terasa empuk." },
+                { nama: "Busi", intervalKm: 10000, ket: "Ganti busi lama agar pembakaran efisien." },
+                { nama: "Sprocket Kit (Gir & Rantai)", intervalKm: 15000, ket: "Ganti gir set jika mata gir sudah mulai meruncing." }
+            ],
+            kopling: [
+                { nama: "Rantai & Gir Motor Sport", intervalKm: 500, ket: "Lumasi berkala. Torsi besar motor sport membuat rantai cepat kendur." },
+                { nama: "Oli Mesin Khusus Sport", intervalKm: 1500, ket: "Wajib ganti oli karena kinerja RPM mesin sport cenderung sangat tinggi." },
+                { nama: "Kabel & Tali Kopling", intervalKm: 2000, ket: "Lumasi kabel kopling agar ditarik enteng dan anti putus." },
+                { nama: "Filter Oli", intervalKm: 8000, ket: "Ganti filter oli tabung agar sirkulasi saringan gram besi bersih." },
+                { nama: "Cairan Pendingin (Radiator)", intervalKm: 10000, ket: "Cek isi coolant penurun panas mesin." }
+            ]
+        };
+
+        // FORM DYNAMIC CONTROLLER
+        document.getElementById('kategoriPemakaian').addEventListener('change', function() {
+            const kategori = this.value;
+            const grupTanggal = document.getElementById('grupTanggal');
+            const grupKmTerakhir = document.getElementById('grupKmTerakhir');
+            const grupKmSekarang = document.getElementById('grupKmSekarang');
+
+            grupTanggal.style.display = 'block';
+            document.getElementById('tanggalTerakhir').setAttribute('required', 'required');
+
+            if (kategori === 'tidak_terpakai') {
+                grupKmTerakhir.style.display = 'none';
+                grupKmSekarang.style.display = 'none';
+                document.getElementById('kmTerakhir').removeAttribute('required');
+                document.getElementById('kmSekarang').removeAttribute('required');
+            } else {
+                grupKmTerakhir.style.display = 'block';
+                grupKmSekarang.style.display = 'block';
+                document.getElementById('kmTerakhir').setAttribute('required', 'required');
+            }
+        });
+
+        document.getElementById('reminderForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const jenisKey = document.getElementById('jenisKendaraan').value;
+            const namaTeks = document.getElementById('jenisKendaraan').options[document.getElementById('jenisKendaraan').selectedIndex].text;
+            const kategori = document.getElementById('kategoriPemakaian').value;
+            const tanggalTerakhirVal = document.getElementById('tanggalTerakhir').value;
+            
+            const resultBox = document.getElementById('resultBox');
+            const checklistBox = document.getElementById('checklistBox');
+
+            resultBox.style.display = 'block';
+            checklistBox.style.display = 'none';
+
+            // Hitung Selisih Hari
+            const tglTerakhir = new Date(tanggalTerakhirVal);
+            const tglSekarang = new Date();
+            const selisihWaktu = tglSekarang - tglTerakhir;
+            const selisihHari = Math.max(0, Math.floor(selisihWaktu / (1000 * 60 * 60 * 24)));
+
+            let kmTerakhir = parseFloat(document.getElementById('kmTerakhir').value) || 0;
+            let kmSekarang = parseFloat(document.getElementById('kmSekarang').value) || 0;
+            let jarakTempuh = 0;
+
+            let kmPerHari = 0;
+            if (kategori === 'normal') kmPerHari = 27.5;
+            if (kategori === 'berat') kmPerHari = 50;
+            if (kategori === 'sangat_berat') kmPerHari = 150;
+
+            if (kategori !== 'tidak_terpakai') {
+                if (!kmSekarang) {
+                    jarakTempuh = Math.round(selisihHari * kmPerHari);
+                    kmSekarang = kmTerakhir + jarakTempuh;
+                } else {
+                    if (kmSekarang < kmTerakhir) {
+                        resultBox.className = 'result alert-danger';
+                        resultBox.innerHTML = `❌ <strong>Kesalahan Input:</strong> KM Sekarang tidak boleh lebih kecil dari KM Terakhir.`;
+                        return;
+                    }
+                    jarakTempuh = kmSekarang - kmTerakhir;
+                }
+            }
+
+            // EVALUASI LOGIKA UTAMA BANNER STATUS
+            let batasServisRutin = (kategori === 'tidak_terpakai') ? (selisihHari >= 90) : (jarakTempuh >= 2000 || selisihHari >= 90);
+
+            if (batasServisRutin) {
+                resultBox.className = 'result alert-danger';
+                resultBox.innerHTML = (kategori === 'tidak_terpakai') 
+                    ? `⚠️ <strong>${namaTeks} (Menganggur)</strong> sudah melewati batas aman pengendapan garasi selama <strong>${selisihHari} hari</strong>. Wajib servis komponen cair!`
+                    : `⚠️ <strong>${namaTeks}</strong> waktunya servis berkala! Berjalan sejauh <strong>${jarakTempuh.toLocaleString('id-ID')} KM</strong> dalam <strong>${selisihHari} hari</strong>.`;
+            } else {
+                resultBox.className = 'result alert-success';
+                resultBox.innerHTML = `✅ Status pemeliharaan <strong>${namaTeks}</strong> tergolong AMAN.`;
+            }
+
+            // PROSES EVALUASI CHECKLIST KOMPONEN SECARA DINAMIS
+            let htmlChecklist = `<h4>🛠️ Hasil Analisis Kondisi Suku Cadang</h4>`;
+            let adaMasalah = false;
+
+            if (kategori === 'tidak_terpakai') {
+                // LOGIKA 1: JIKA MENGANGGUR -> GABUNG DATA UMUM MENGANGGUR DAN DATA KHUSUS JENIS MOTOR MENGANGGUR
+                const partUmum = aturanMenganggur.umum;
+                const partKhusus = aturanMenganggur[jenisKey];
+                const gabungPartMenganggur = partUmum.concat(partKhusus || []);
+
+                gabungPartMenganggur.forEach(function(part) {
+                    if (selisihHari >= part.intervalHari) {
+                        adaMasalah = true;
+                        let hitungBulan = Math.floor(part.intervalHari / 30);
+                        htmlChecklist += `
+                            <div class="checklist-item">
+                                <span class="badge">Wajib Ganti</span>
+                                <div class="checklist-item-text">
+                                    <strong>${part.nama}</strong>
+                                    <p>${part.ket} <span style="color: #ef4444; font-weight:600;">(Batas Diam: ${hitungBulan} Bulan / Terlewati: ${selisihHari} hari)</span></p>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+            } else {
+                // LOGIKA 2: JIKA MOTOR JALAN -> HANYA PROSES BERDASARKAN JARAK KM BERJALAN
+                const partJalan = aturanJalan[jenisKey];
+                if (partJalan) {
+                    partJalan.forEach(function(part) {
+                        if (jarakTempuh >= part.intervalKm) {
+                            adaMasalah = true;
+                            htmlChecklist += `
+                                <div class="checklist-item">
+                                    <span class="badge">Wajib Ganti</span>
+                                    <div class="checklist-item-text">
+                                        <strong>${part.nama}</strong>
+                                        <p>${part.ket} <span style="color: #ef4444; font-weight:600;">(Batas per ${part.intervalKm.toLocaleString('id-ID')} KM / Pemakaian Anda: ${jarakTempuh.toLocaleString('id-ID')} KM)</span></p>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    });
+                }
+            }
+
+            if (!adaMasalah) {
+                htmlChecklist += `
+                    <div class="checklist-item">
+                        <span class="badge badge-safe">OK</span>
+                        <div class="checklist-item-text">
+                            <strong>Seluruh Suku Cadang Aman</strong>
+                            <p>Belum ada part yang menyentuh batas kritis kedaluwarsa waktu diam maupun limit kilometer jalan.</p>
+                        </div>
+                    </div>
+                `;
+            }
+
+            checklistBox.style.display = 'block';
+            checklistBox.innerHTML = htmlChecklist;
+        });
+    </script>
+</body>
+</html>
